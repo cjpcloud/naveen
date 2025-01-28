@@ -1,0 +1,30 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - feature/docker-image
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      BASE_IMAGE: "eclipse-temurin:17-jdk-alpine" # Base image for builder stage
+      RUNTIME_IMAGE: "scratch"                   # Runtime image for final stage
+      IMAGE_NAME: "your-repo/your-image-name"    # Target image repository name
+      IMAGE_TAG: "latest"                        # Image tag (e.g., latest or build ID)
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Build the Docker image using the multi-stage Dockerfile
+      - name: Build Docker Image
+        run: |
+          docker buildx build \
+            --build-arg BASE_IMAGE=${BASE_IMAGE} \
+            --build-arg RUNTIME_IMAGE=${RUNTIME_IMAGE} \
+            -t ${IMAGE_NAME}:${IMAGE_TAG}
+              .

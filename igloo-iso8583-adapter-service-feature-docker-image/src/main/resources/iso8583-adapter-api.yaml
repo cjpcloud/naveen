@@ -1,0 +1,42 @@
+openapi: 3.0.1
+info:
+  title: ISO8583 Adapter Service API
+  description: API for processing ISO8583 messages
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+paths:
+  /iso8583/message:
+    post:
+      operationId: processISOMessage
+      summary: Consume the String format message and convert it to byte array for further processing.
+      description: Consumes an ISO8583 message in String format, convert it to byte array and parses it, and returns the processed result.
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Processed ISO8583 message response
+          content:
+            text/plain:
+              schema:
+                type: string
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Error message
