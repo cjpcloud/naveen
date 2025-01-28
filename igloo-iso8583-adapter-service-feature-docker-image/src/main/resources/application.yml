@@ -1,0 +1,83 @@
+
+spring:
+  application:
+    name: "@project.name@"
+    version: "@project.version@"
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+  profiles:
+    active:
+      - handler
+
+  kafka:
+    producer:
+      bootstrap-servers: ${IGLOO.spring.kafka.producer.bootstrap-servers}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+      properties:
+        sasl:
+          jaas:
+            config: ${IGLOO.spring.kafka.producer.properties.sasl.jaas.config}
+          mechanism: PLAIN
+        security:
+          protocol: SASL_SSL
+
+
+
+server:
+  port: 8080
+
+config:
+  secrets:
+    enabled: true
+    prefix: IGLOO
+    managed-identity:
+      enabled: true
+authengine:
+  service:
+    port: 9091
+    host: authengine
+    initialThreadPoolCount: 10
+    maxThreadPoolCount: 50
+    keepAliveTime: 10
+    keepAliveTimeout: 5
+    deadlineTimeout: 2000
+
+    #port: authengine.igloo.svc.cluster.local:9091
+
+grpc:
+  server:
+    port: 9090
+
+springdoc:
+  api-docs:
+    path: /igloo/api-docs
+  swagger-ui:
+    path: /igloo/
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      authEngine:
+        registerHealthIndicator: true
+        slidingWindowSize: 2
+        failureRateThreshold: 50
+        waitDurationInOpenState: 1000ms
+        permittedNumberOfCallsInHalfOpenState: 2
+
+event:
+
+  topic:
+    name: ${IGLOO.event.topic.name}
+
+
+retry:
+  config:
+    maxAttempts: 3
+    waitDuration: 500
+
+currencyCode:
+  '{"USD":840}'

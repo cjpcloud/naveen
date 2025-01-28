@@ -1,0 +1,87 @@
+
+trigger: none
+pr: none
+
+pool:
+  name: 'demo-agent-pool'
+
+variables:
+  - group: igloo-az-login
+  - name: imagename
+    value: iglooacrdev.azurecr.io/adapter
+  - name: imageserver
+    value: iglooacrdev.azurecr.io
+  - name: uama_clientid
+    value: e5eab22e-f7ff-4f60-b848-2484aa16a772
+  - name: servicename
+    value: adapter
+  - name: namespace
+    value: igloo
+  - name: buildid
+    value: $(Build.BuildNumber)
+
+
+steps:
+- script: |
+    envsubst < settings.xml > settings_modified.xml
+    ls -latr
+    cat settings_modified.xml
+    
+  displayName: Replace Settings.xml
+  env:
+    feedsecret: $(FEED_SECRET)
+
+- script: |
+     mvn --batch-mode clean install -DskipTests -s settings_modified.xml
+  displayName: Building Adapter Service
+
+
+# - script: |
+#      ls -la ./target
+#     #igloo-adapter-service-0.0.1-SNAPSHOT.jar
+#   displayName: checking Path
+
+- script: |
+     docker build . -t $(imagename):$(buildid)
+     docker images
+  displayName: Creating Dockerfile
+
+#- script: |
+#    az login --identity --username $(uama_clientid)
+#    az acr login --name $(imageserver)
+#    docker push $(imagename):$(buildid)
+
+#  displayName: Logging to ACR using UAMA and push to ACR
+
+#- task: CmdLine@2
+#  inputs:
+#      script: | 
+#        echo "Logging into Azure and connecting to cluster"  
+#        az login --service-principal -u $(AZURE_CLIENT_ID) -p $(AZURE_CLIENT_SECRET) --tenant $(AZURE_TENANT_ID)
+#        az aks get-credentials --resource-group nationsbenefits-igloo-dev --name igloo-demo --overwrite-existing
+#        kubelogin   convert-kubeconfig -l azurecli
+#        kubectl get ns
+#  displayName: 'AZ login and Kubernetes'
+
+#- script: |
+
+#    #envsubst < deployment.yml > deployment_modified.yml
+#    #cat deployment_modified.yml
+
+#    kubectl config set-context --current --namespace=$(namespace)
+#    envsubst < deployment.yml | kubectl apply -f -
+#    envsubst < service.yml | kubectl apply -f -
+
+#    kubectl get deploy --namespace=$(namespace)
+#    kubectl get svc --namespace=$(namespace)
+
+#  displayName: Deploy app
+#  workingDirectory: manifests
+
+#- task: DeleteFiles@1
+#  displayName: 'clean Workspace'
+#  inputs: 
+#    SourceFolder: '$(Pipeline.Workspace)'
+#    Contents: '**/*'
+#    RemoveDotFiles: true
+#  condition: always() 
