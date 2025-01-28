@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $SERVICENAME-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: $SERVICENAME
+  template:
+    metadata:
+      labels:
+        app: $SERVICENAME
+    spec:
+      containers:
+      - name: $SERVICENAME-container
+        image: $IMAGENAME:$BUILDID
+        env: 
+        - name: config.secrets.uri
+          value: https://igloo-demo.vault.azure.net
+        - name: config.secrets.clientid
+          value: e5eab22e-f7ff-4f60-b848-2484aa16a772             
+        ports:
+        # - containerPort: 8081
+        - containerPort: 9091
+        securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 1002
+

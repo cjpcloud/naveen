@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package com.nationsbenefits.igloo.member.models.protobuf;
+
+option java_multiple_files = true;
+option java_package = "com.nationsbenefits.igloo.member.models.protobuf";
+option java_outer_classname = "MemberServiceProto";
+
+import "com/nationsbenefits/igloo/common/models/protobuf/common_models.proto";
+
+// MemberService defines the RPC service for retrieving member details
+service MemberService {
+  /**
+    * RPC method to retrieve member details based on a MemberQuery details
+    * This method takes a MemberQuery as input and returns a MemberResponse
+    */
+  rpc retrieveMemberDetails(MemberQuery) returns (MemberResponse) {
+  }
+}
+
+/** MemberQuery represents the parameters to retrieve member details
+  * by : The field by which to fetch the member details (e.g., "MemberId")
+  * value : The value of the field to query (e.g., the actual ID of member)
+  */
+message MemberQuery {
+  string by = 1;
+  string value = 2;
+}
+
+/** MemberResponse represents the response containing member details
+  * The member details retrieved based on the MemberQuery
+  */
+message MemberResponse {
+  com.nationsbenefits.igloo.common.models.protobuf.Member member = 1;
+}

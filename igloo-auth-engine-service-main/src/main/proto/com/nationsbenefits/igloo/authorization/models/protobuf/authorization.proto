@@ -1,0 +1,89 @@
+
+syntax = "proto3";
+
+//package nationsbenefits.igloo.protobuf.auth;
+package com.nationsbenefits.igloo.authorization.models.protobuf;
+
+import "com/nationsbenefits/igloo/common/models/protobuf/common_models.proto";
+
+option java_multiple_files = true;
+option java_package = "com.nationsbenefits.igloo.authengine.grpc";
+option java_outer_classname = "AuthorizationProto";
+
+service AuthorizationService {
+  rpc processAuthorizationRequest (AuthRequest) returns (AuthResponse) {
+  }
+
+  rpc processAuthorizationMock (AuthRequest) returns (AuthResponse) {
+  }
+}
+
+message AuthRequest {
+  ISOMessage isoMessage = 1;
+}
+
+
+message AuthResponse {
+  string statusCode = 1;
+  ISOMessage isoMessage = 2;
+  AuthResponseStatus responseCode = 3;
+
+}
+
+
+message ISOMessage {
+  ISOFormat isoFormat = 1;
+  com.nationsbenefits.igloo.common.models.protobuf.Card card = 2;
+  com.nationsbenefits.igloo.common.models.protobuf.Merchant merchant = 3;
+  com.nationsbenefits.igloo.common.models.protobuf.Transaction transaction = 4;
+  MessageType messageType = 5;
+  Channel channel = 6;
+
+}
+
+
+message ISOFormat {
+  string isoFormatId = 1 /*[default = "ISO8583"]*/;
+}
+
+message MessageType {
+  string messageType = 1 /*[default = ""]*/;
+}
+
+message Channel {
+  string channel = 1;
+}
+
+
+
+message AuthResponseStatus {
+  AuthResponseCode authResponseCode = 2;
+  string responseDescription = 3;
+}
+
+
+enum AuthResponseCode {
+  AUTH_UNKNOWN = 0;
+  AUTH_ALLOW = 1; //Fraud Start
+  AUTH_DENY = 2;
+  AUTH_PFRAUD = 3;
+  AUTH_OFAC_DENY = 4;
+  AUTH_ERROR = 5; // Fraud end
+  AUTH_INVALID_MERCHANT = 6; // Bas start
+  AUTH_INSUFFICIENT_FUNDS = 7;
+  AUTH_EXCEEDED_TRANSACTION_LIMIT = 8; // Bas End
+  AUTH_TRANSACTION_POSTED = 9;//ledger start
+  AUTH_TRANSACTION_ERROR = 10;
+  AUTH_INSUFFICIENT_FUND = 11;
+  AUTH_ACCOUNT_NOT_FOUND = 12;//ledger end
+  AUTH_OTHER=13;
+  AUTH_CARD_NUMBER_INVALID = 14; //card start
+  AUTH_CARD_NOT_ACTIVATED = 15;
+  AUTH_CARD_EXPIRED = 16;
+  AUTH_CVV_MISMATCH = 17;
+  AUTH_CARD_AUTHENTICATION_FAILED = 18;
+  AUTH_CARD_SUCCESS = 19;//card end
+  AUTH_PARTIAL_ALLOW = 20;//Partially allowed
+  AUTH_PIN_VALIDATION_FAILURE =21; //card incorrect pin
+  AUTH_CARD_LOCKED =22;
+}

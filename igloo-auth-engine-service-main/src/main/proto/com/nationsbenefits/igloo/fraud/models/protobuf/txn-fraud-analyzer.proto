@@ -1,0 +1,84 @@
+/**
+ * Copyright Â© 2024, NationsBenefits. All Rights reserved
+ */
+
+syntax = "proto3";
+
+package com.nationsbenefits.igloo.fraud.models.protobuf;
+
+import "com/nationsbenefits/igloo/common/models/protobuf/common_models.proto";
+
+option java_multiple_files = true;
+option java_package = "com.nationsbenefits.igloo.txn.fraud.analyzer.grpc";
+option java_outer_classname = "TxnFraudAnalyzer";
+
+/**
+ * TxnFraudAnalyzerService provides an RPC method to analyze a transaction
+ * for potential fraud.
+ */
+service TxnFraudAnalyzerService {
+  /**
+   * Analyzes a transaction to determine its fraud status.
+   *
+   * @param AnalyzeTransactionRequest request containing card and transaction details.
+   * @return AnalyzeTransactionResponse containing the fraud analysis result.
+   */
+  rpc analyzeTransaction(AnalyzeTransactionRequest) returns (AnalyzeTransactionResponse);
+
+  rpc saveTransactionForVelocityCheck(AnalyzeTransactionRequest) returns (SaveTransactionForVelocityCheckResponse);
+}
+
+
+
+/**
+ * AnalyzeTransactionRequest is the request message for analyzing a transaction.
+ */
+message AnalyzeTransactionRequest {
+  /** The card information associated with the transaction. */
+  com.nationsbenefits.igloo.common.models.protobuf.Card card = 1;
+
+  /** The transaction details to be analyzed. */
+  com.nationsbenefits.igloo.common.models.protobuf.Transaction transaction = 2;
+}
+
+/**
+ * AnalyzeTransactionResponse is the response message containing the results
+ * of the fraud analysis.
+ */
+message AnalyzeTransactionResponse {
+  /** The code indicating the result of the fraud analysis. */
+  TxnFraudResponseCode code = 1;
+
+  /** A descriptive message providing details of the analysis result. */
+  string desc = 2;
+}
+
+message SaveTransactionForVelocityCheckResponse {
+  com.nationsbenefits.igloo.common.models.protobuf.Transaction transaction = 1;
+}
+
+/**
+ * TxnFraudResponseCode represents possible results from a fraud analysis.
+ */
+enum TxnFraudResponseCode {
+  /** Unknown fraud status; no definitive result. */
+  TXNFRAUD_UNKNOWN = 0;
+
+  /** Transaction is allowed with no fraud detected. */
+  TXNFRAUD_ALLOW = 1;
+
+  /** Transaction is denied due to detected fraud. */
+  TXNFRAUD_DENY = 2;
+
+  /** Potential fraud detected; further review is advised. */
+  TXNFRAUD_PFRAUD = 3;
+
+  /** Transaction denied due to OFAC (Office of Foreign Assets Control) regulations. */
+  TXNFRAUD_OFAC_DENY = 4;
+
+  /** An error occurred during fraud analysis. */
+  TXNFRAUD_ERROR = 5;
+
+  /** Other type of fraud detected that does not fall into the predefined categories. */
+  TXNFRAUD_OTHER = 6;
+}

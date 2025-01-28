@@ -1,0 +1,20 @@
+server:
+  port: 8081
+
+grpc:
+  server:
+    port: 9091
+    inProcessName: authengine
+
+
+#Below properties should be fetched from AKV
+service:
+  address:
+    card: localhost:9092
+    txnFraud: localhost:9097
+    member : localhost:9093
+    memberAccount : localhost:9094
+    BAS : localhost:9095
+    ledger : localhost:9096
+
+

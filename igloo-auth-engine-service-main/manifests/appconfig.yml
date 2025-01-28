@@ -1,0 +1,15 @@
+apiVersion: azconfig.io/v1
+kind: AzureAppConfigurationProvider
+metadata:
+  name: $SERVICENAME-appconfig
+  namespace: igloo
+spec:
+  endpoint: https://igloo-myappconfig.azconfig.io
+  target:
+    configMapName: $SERVICENAME-appconfig
+  auth:
+    managedIdentityClientId: e5eab22e-f7ff-4f60-b848-2484aa16a772
+  configuration:
+    selectors:
+      - keyFilter: APP_ENV
+      - keyFilter: NODE_ENV

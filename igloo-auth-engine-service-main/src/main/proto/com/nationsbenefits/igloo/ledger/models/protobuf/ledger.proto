@@ -1,0 +1,148 @@
+
+syntax = "proto3";
+
+package com.nationsbenefits.igloo.ledger.models.protobuf;
+
+import "google/protobuf/timestamp.proto";
+import "com/nationsbenefits/igloo/common/models/protobuf/common_models.proto";
+
+option java_multiple_files = true;
+option java_package = "com.nationsbenefits.igloo.ledger.grpc";
+option java_outer_classname = "Ledger";
+
+/**
+  Ledger Service defines the methods exposed and the input and output requirements.
+ */
+service LedgerService {
+  rpc postTransaction(PostTransactionRequest) returns (PostTransactionResponse);
+  rpc reversalTransaction(ReversalTransactionRequest) returns (ReversalTransactionResponse);
+  rpc balanceEnquiry(BalanceEnquiryRequest) returns (BalanceEnquiryResponse);
+}
+
+/**
+  * Ledger Status Code enum defines the status codes thrown by different operations of the ledger service.
+ */
+enum LedgerStatusCode {
+  LEDGER_UNKNOWN = 0;
+  LEDGER_TRANSACTION_POSTED = 1;
+  LEDGER_TRANSACTION_ERROR = 2;
+  LEDGER_INSUFFICIENT_FUND = 3;
+  LEDGER_ACCOUNT_NOT_FOUND = 4;
+  LEDGER_OTHER = 5;
+}
+
+/**
+  * Member Account definition. Will have the following fields:
+  * account: The account associated with this member account. This is a required field.
+  * purseAccounts: The purse accounts associated with this member account. This is a required field.
+  */
+message MemberAccount {
+  com.nationsbenefits.igloo.common.models.protobuf.Account account = 1; // The account associated with this member account.
+  repeated com.nationsbenefits.igloo.common.models.protobuf.PurseAccount purseAccounts = 2; // The purse accounts associated with this member account.
+}
+
+/**
+  * Purse Account Balance definition. Will have the following fields:
+  * account: The account associated with this purse account. This is a required field.
+  * availableBalance: The available balance of this purse account. This is a required field.
+  */
+message PurseAccountBalance {
+  com.nationsbenefits.igloo.common.models.protobuf.Account account = 1; // The account associated with this purse account.
+  double availableBalance = 2; // The available balance of this purse account.
+}
+
+/**
+  * Member Account Balance definition. Will have the following fields:
+  * account: The account associated with this member account. This is a required field.
+  * purseAccounts: The purse accounts associated with this member account. This is a required field.
+  */
+message MemberAccountBalance {
+  com.nationsbenefits.igloo.common.models.protobuf.Account account = 1;
+  repeated PurseAccountBalance purseAccounts = 2;
+}
+
+/**
+  * Post Transaction Request definition. Will have the following fields:
+  * transaction: The transaction details of the member account.
+  * memberAccount: The member account associated with this transaction. This is a required field.
+  */
+message PostTransactionRequest {
+  com.nationsbenefits.igloo.common.models.protobuf.Transaction transaction = 1; // The transaction details of the member account.
+  MemberAccount memberAccount = 2; // The member account associated with this transaction.
+}
+
+/**
+  * Reversal Transaction Request definition. Will have the following fields:
+  * customerAccount: The customer account to which the reversal should happen. This is required field.
+  * transaction: The transaction details such as ID, amount for this reversal.
+  */
+message ReversalTransactionRequest {
+  MemberAccount customerAccount = 1; // The customer account to which the reversal should happen.
+  com.nationsbenefits.igloo.common.models.protobuf.Transaction transaction = 2; // The transaction details such as ID, amount for this reversal.
+}
+
+/**
+  * Balance Enquiry Request definition. Will have the following fields:
+  * customerAccount: The customer account to which balance needs to be checked. This is required field.
+  * transactionId: The transaction id of this request.
+  */
+message BalanceEnquiryRequest {
+  MemberAccount customerAccount = 1; // The customer account to which balance needs to be checked.
+  string transactionId = 2; // The transaction id of this request.
+}
+
+/**
+  * Transaction Status definition. Will have the following fields:
+  * statusCode: The status code of the transaction.
+  * statusMessage: The status message of the transaction.
+  * errorMessage: The error message of the transaction if any error occurs.
+  */
+message TransactionStatus {
+  LedgerStatusCode statusCode = 1; // The status code of the transaction.
+  string statusMessage = 2; // The status message of the transaction.
+  ErrorMessage  errorMessage =3; // The error message of the transaction if any error occurs.
+
+}
+
+/**
+  * Error Message definition. Will have the following fields:
+  * errorCode: The error code of the transaction.
+  * errorMessage: The error message of the transaction if any error occurs.
+  */
+message ErrorMessage {
+  int32 errorCode = 1; // The error code of the transaction.
+  string errorMessage = 2; // The error message of the transaction if any error occurs.
+}
+
+/**
+  * Post Transaction Response definition. Will have the following fields:
+  * transactionStatus: The status of the transaction i.e. status code and status message.
+  * errorMessage: The error message of the transaction if any error occurs.
+  */
+message PostTransactionResponse {
+  TransactionStatus transactionStatus = 1; // The status of the transaction i.e. status code and status message.
+  string errorMessage = 2; // The error message of the transaction if any error occurs.
+}
+
+/**
+  * Reversal Transaction Response definition. Will have the following fields:
+  * transactionStatus: The status of the transaction i.e. status code and status message.
+  * errorMessage: The error message of the transaction if any error occurs.
+  */
+message ReversalTransactionResponse {
+  TransactionStatus transactionStatus = 1; // The status of the transaction i.e. status code and status message.
+  string errorMessage = 2; // The error message of the transaction if any error occurs.
+}
+
+/**
+  * Balance Enquiry Response definition. Will have the following fields:
+  * transactionStatus: The status of the transaction i.e. status code and status message.
+  * memberAccountBalance: The current balance of the member account.
+  * errorMessage: The error message of the transaction if any error occurs.
+  */
+message BalanceEnquiryResponse {
+  TransactionStatus transactionStatus = 1; // The status of the transaction i.e. status code and status message.
+  MemberAccountBalance memberAccountBalance = 2; // The current balance of the member account.
+  string errorMessage = 3; // The error message of the transaction if any error occurs.
+}
+

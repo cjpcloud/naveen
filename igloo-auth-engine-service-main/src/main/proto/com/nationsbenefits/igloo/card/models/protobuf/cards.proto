@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package com.nationsbenefits.igloo.card.models.protobuf;
+import "com/nationsbenefits/igloo/common/models/protobuf/common_models.proto";
+
+option java_multiple_files = true;
+option java_package = "com.nationsbenefits.igloo.card.grpc";
+option java_outer_classname = "Cards";
+
+// Definition of Card gRPC service for Card operations
+service CardService {
+  // RPC method to validate and fetch card details
+  rpc validateAndFetchCardDetails(CardQuery) returns (CardResponse) {
+  }
+}
+
+// Message definition for CardQuery
+message CardQuery {
+  string by = 1;
+  string value = 2; // Identifier value (e.g., hashed PAN, This may be used to look up the card in the database in case PAN adjustment is needed.)
+  CardValidation cardValidation = 3;
+}
+
+// Message definition for CardQuery
+message CardValidation {
+  string encryptedPIN = 1;
+  string encryptedCVV = 2; //
+
+}
+
+// Message definition for CardResponse
+message CardResponse {
+  com.nationsbenefits.igloo.common.models.protobuf.Card card = 1; // Card details
+  CardResponseCode cardStatus = 2; // Status of the card validation
+
+}
+
+// Message definition for CardDetails
+message CardDetails {
+  string ID = 1;   // Unique identifier for the card
+  string UID = 2;  // Universal identifier for the card
+  string status = 3; // Status of the card
+  string type = 4;   // Type of the card (e.g., debit, credit)
+}
+
+// Message definition for MemberAccount
+message MemberAccount {
+  string ID = 1; // Unique identifier for the member account
+  //Add account
+}
+
+// Enum definition for CardResponseCode
+enum CardResponseCode {
+  CARD_UNKNOWN = 0; // Unknown card status
+  CARD_NUMBER_INVALID = 1; // Invalid card number
+  CARD_NOT_ACTIVATED = 2; // Card not activated
+  CARD_EXPIRED = 3; // Card expired
+  CVV_MISMATCH = 4; // CVV mismatch
+  CARD_AUTHENTICATION_FAILED = 5; // Card authentication failed
+  SUCCESS = 6; // Success
+  CARD_NOT_DEBIT = 7; // Card is not a debit card
+  LOCKED = 8; // Card status is Locked
+  PIN_VALIDATION_FAILURE = 9; // PIN validation failure
+  ACTIVE = 10; //Card status is Active
+}

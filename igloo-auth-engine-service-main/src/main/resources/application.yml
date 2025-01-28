@@ -1,0 +1,84 @@
+server:
+  port: 8081
+application:
+  name: igloo-auth-engine-service
+grpc:
+  server:
+    port: 9091
+    inProcessName: authengine
+spring:
+  application:
+    name: "@project.name@"
+    version: "@project.version@"
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+  profiles:
+    active:
+      - handler
+  kafka:
+    producer:
+      bootstrap-servers: ${spring.kafka.producer.bootstrap-servers}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      properties:
+        sasl:
+          jaas:
+            config: ${spring.kafka.producer.properties.sasl.jaas.config}
+          mechanism: PLAIN
+        security:
+          protocol: SASL_SSL
+config:
+  secrets:
+    enabled: true
+    prefix: IGLOO
+    managed-identity:
+      enabled: true
+event:
+  topic:
+    name: igloo-elog-ingress
+
+#Below properties should be fetched from AKV
+service:
+  host:
+    card: card
+    txnFraud: igloo-txn-fraud-analyzer
+    member : member
+    memberAccount : account
+    BAS : adjudication
+    ledger : balance
+  port:
+    card: 9092
+    txnFraud: 9097
+    member: 9093
+    memberAccount: 9094
+    BAS: 9095
+    ledger: 9096
+  initialThreadPoolCount: 1
+  maxThreadPoolCount: 10
+  keepAliveTime: 10
+  keepAliveTimeout: 5
+  deadlineTimeout: 2000
+
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      authEngine:
+        registerHealthIndicator: true
+        slidingWindowSize: 2
+        failureRateThreshold: 50
+        waitDurationInOpenState: 1000ms
+        permittedNumberOfCallsInHalfOpenState: 2
+
+
+retry:
+  config:
+    maxAttempts: 3
+    waitDuration: 500
+
+# Logging-Config
+logging:
+  level:
+    root: ERROR
+    com.nationsbenefits.igloo.authengine: ERROR

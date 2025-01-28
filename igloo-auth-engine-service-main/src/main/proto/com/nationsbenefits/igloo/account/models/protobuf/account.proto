@@ -1,0 +1,37 @@
+
+syntax = "proto3";
+
+package com.nationsbenefits.igloo.account.models.protobuf;
+
+option java_multiple_files = true;
+option java_package = "com.nationsbenefits.igloo.account.grpc";
+option java_outer_classname = "AccountProto";
+
+import "com/nationsbenefits/igloo/common/models/protobuf/common_models.proto";
+
+/**
+ * The AccountService helps to retrieve account details for a member.
+ */
+service AccountService {
+  rpc RetrieveMemberAccountDetails(AccountQuery) returns (AccountDetailsResponse) {}
+}
+
+/**
+  * Account Query Request definition. Will have the following fields:
+  * by: Represents by which field we want to search the data in db
+  * value: Represents the value of the field
+  */
+message AccountQuery {
+  string by = 1;
+  string value = 2;
+}
+
+/**
+  * Account Details Response definition. Will have the following fields:
+  * Account : Return Account object with details
+  */
+message AccountDetailsResponse {
+  com.nationsbenefits.igloo.common.models.protobuf.MemberAccount memberAccount = 1;
+}
+
+
